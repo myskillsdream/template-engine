@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.route('/').get((req, res) => {
 
-  res.render(/views/pug/index)
+  res.render(process.cwd() + '/views/pug');
 
 });
 
