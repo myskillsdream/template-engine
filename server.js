@@ -30,6 +30,7 @@ myDB(async (client) => {
   const myDataBase = await client.db('database').collection('users');
 
   app.route('/').get((req, res) => {
+    
     res.render('pug', {
       title: 'Connected to Database',
       message: 'Please login',
@@ -41,7 +42,7 @@ myDB(async (client) => {
     res.redirect('/profile');
   });
 
-  app.route('/profile').get((req, res) => {
+  app.route('/profile').get(ensureAuthenticated, (req, res) => {
     res.render(process.cwd() + '/views/pug/profile');
   });
 
@@ -64,12 +65,18 @@ myDB(async (client) => {
       });
     }
   ));
-  
 }).catch((e) => {
   app.route('/').get((req, res) => {
     res.render('pug', { title: e, message: 'Unable to login' });
   });
 });
+
+const ensureAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect('/');
+}
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('Listening on port ' + process.env.PORT);
