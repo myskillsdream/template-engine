@@ -7,6 +7,7 @@ const session = require('express-session');
 const passport = require('passport');
 const ObjectID = require('mongodb').ObjectID;
 const LocalStrategy = require('passport-local');
+const bcrypt = require('bcrypt');
 
 const app = express();
 app.set('view engine', 'pug');
@@ -92,12 +93,13 @@ app.use((req, res, next) => {
     });
   });
   passport.use(new LocalStrategy(
-    function(username, password, done) {
+    function (username, password, done) {
       myDataBase.findOne({ username: username }, function (err, user) {
-        console.log('User '+ username +' attempted to log in.');
         if (err) { return done(err); }
         if (!user) { return done(null, false); }
-        if (password !== user.password) { return done(null, false); }
+        if (!bcrypt.compareSync(password, user.password)) { 
+          return done(null, false);
+        }
         return done(null, user);
       });
     }
