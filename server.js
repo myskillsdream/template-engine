@@ -39,6 +39,20 @@ myDB(async (client) => {
     });
   });
 
+  app.route('/login').post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
+    res.redirect('/profile');
+  });
+
+  app.route('/profile').get(ensureAuthenticated, (req, res) => {
+    res.render(process.cwd() + '/views/pug/profile', { username: req.user.username });
+  });
+
+  app.route('/logout')
+  .get((req, res) => {
+    req.logout();
+    res.redirect('/');
+});
+
   app.route('/register').post(
     (req, res, next) => {
       myDataBase.findOne({ username: req.body.username }, function (err, user) {
@@ -62,16 +76,6 @@ myDB(async (client) => {
       res.redirect('/profile');
     }
   );
-
-  app.route('/profile').get(ensureAuthenticated, (req, res) => {
-    res.render(process.cwd() + '/views/pug/profile', { username: req.user.username });
-  });
-
-  app.route('/logout')
-  .get((req, res) => {
-    req.logout();
-    res.redirect('/');
-});
 
 app.use((req, res, next) => {
   res.status(404)
