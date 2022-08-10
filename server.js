@@ -30,11 +30,19 @@ myDB(async (client) => {
   const myDataBase = await client.db('database').collection('users');
 
   app.route('/').get((req, res) => {
-
     res.render('pug', {
       title: 'Connected to Database',
-      message: 'Please login'
+      message: 'Please login',
+      showLogin: true
     });
+  });
+
+  app.route('/login').post(passport.authenticate('local', { failureRedirect: '/' }), (req, res) => {
+    res.redirect('/profile');
+  });
+
+  app.route('/profile').get((req, res) => {
+    res.render(process.cwd() + '/views/pug/profile');
   });
 
   passport.serializeUser((user, done) => {
@@ -45,7 +53,6 @@ myDB(async (client) => {
       done(null, doc);
     });
   });
-
   passport.use(new LocalStrategy(
     function(username, password, done) {
       myDataBase.findOne({ username: username }, function (err, user) {
