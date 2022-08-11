@@ -32,6 +32,7 @@ app.use(session({
   key: 'express.sid',
   store: store
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
